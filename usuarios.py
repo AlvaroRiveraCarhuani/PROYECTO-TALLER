@@ -35,7 +35,7 @@ def iniciar_sesion(email, contrasena):
 
     if usuario:
         print(f"Bienvenido, {usuario[1]}!")
-        return usuario[0]  
+        return usuario[0]  # Devuelve el ID del usuario
     else:
         print("Correo electrónico o contraseña incorrectos.")
         return None
