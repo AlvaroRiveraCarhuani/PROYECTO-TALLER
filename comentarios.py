@@ -32,42 +32,40 @@ def leer_comentarios(id_publicacion):
             print(f"{comentario[0]}. {comentario[1]}: {comentario[2]}")  
 
     cursor.close()
-
-def actualizar_comentario(id_usuario):
-    # Obtener y mostrar los comentarios del usuario
+def actualizar_comentario():
     cursor = db.connection.cursor()
     consulta = """
-        SELECT id_comentario, contenido 
-        FROM comentarios 
-        WHERE id_usuario = %s
+        SELECT c.id_comentario, u.nombre_usuario, c.contenido 
+        FROM comentarios c 
+        JOIN usuarios u ON c.id_usuario = u.id_usuario
     """
-    cursor.execute(consulta, (id_usuario,))
+    cursor.execute(consulta)
     comentarios = cursor.fetchall()
 
-    # Verificar si el usuario tiene comentarios para actualizar
     if not comentarios:
-        print("No tienes comentarios para editar.")
+        print("No hay comentarios disponibles para editar.")
         cursor.close()
         return
-
-    print("\nTus comentarios:")
+    
+    print("\nComentarios disponibles:")
     for comentario in comentarios:
-        print(f"ID: {comentario[0]} | Contenido: {comentario[1]}")
+        print(f"ID: {comentario[0]} | Usuario: {comentario[1]} | Contenido: {comentario[2]}")
 
     id_comentario = input("\nIntroduce el ID del comentario que deseas editar: ")
 
     if id_comentario not in [str(c[0]) for c in comentarios]:
-        print("Error: Selecciona un comentario que te pertenezca.")
+        print("Error: Selecciona un comentario válido.")
         cursor.close()
         return
+
     nuevo_contenido = input("Introduce el nuevo contenido del comentario: ")
-    # Actualiza el comentario
+
     consulta_actualizacion = """
         UPDATE comentarios 
         SET contenido = %s 
-        WHERE id_comentario = %s AND id_usuario = %s
+        WHERE id_comentario = %s
     """
-    cursor.execute(consulta_actualizacion, (nuevo_contenido, id_comentario, id_usuario))
+    cursor.execute(consulta_actualizacion, (nuevo_contenido, id_comentario))
     db.connection.commit()
 
     print("Comentario actualizado exitosamente.")
@@ -77,7 +75,6 @@ def eliminar_comentario(id_usuario):
     leer_publicaciones()
     id_publicacion = input("\nIntroduce el ID de la publicación para ver los comentarios: ")
 
-    # Mostrar los comentarios asociados a esa publicación
     cursor = db.connection.cursor()
     consulta = """
         SELECT c.id_comentario, u.nombre_usuario, c.contenido
@@ -96,10 +93,8 @@ def eliminar_comentario(id_usuario):
     for comentario in comentarios:
         print(f"ID: {comentario[0]} | Usuario: {comentario[1]} | Contenido: {comentario[2]}")
 
-    # Solicita el ID del comentario a eliminar
     id_comentario = input("\nIntroduce el ID del comentario que deseas eliminar: ")
 
-    # Verificar si el ID ingresado corresponde a un comentario válido
     if id_comentario not in [str(c[0]) for c in comentarios]:
         print("Error: Selecciona un comentario válido.")
         cursor.close()

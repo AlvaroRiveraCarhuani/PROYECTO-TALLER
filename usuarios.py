@@ -7,12 +7,10 @@ def registrar_usuario():
         email = input("Introduce tu correo electrónico: ").strip()
         contrasena = input("Introduce tu contraseña: ").strip()
 
-        # Valida que ninguno de los campos esté vacío
         if not nombre_usuario or not email or not contrasena: 
             print("Todos los campos son obligatorios. Por favor, rellena todos los campos.")
             continue
         
-        # Valida que el correo electrónico tenga su formato
         if "@" not in email or "." not in email:
             print("Por favor, introduce un correo electrónico válido.")
             continue
@@ -36,18 +34,26 @@ def iniciar_sesion():
     contrasena = input("Introduce tu contraseña: ")
 
     contrasena_hasheada = hashlib.sha256(contrasena.encode()).hexdigest()
+    cursor = None
+    usuario = None
 
-    cursor = db.connection.cursor()
+    try:
+        cursor = db.connection.cursor()
+        consulta = "SELECT id_usuario, nombre_usuario FROM usuarios WHERE email = %s AND contrasena = %s"
+        cursor.execute(consulta, (email, contrasena_hasheada))
+        usuario = cursor.fetchone()  
 
-    consulta = "SELECT id_usuario, nombre_usuario FROM usuarios WHERE email = %s AND contrasena = %s"
-    cursor.execute(consulta, (email, contrasena_hasheada))
-    usuario = cursor.fetchone()
+        cursor.fetchall()  
 
-    if usuario:
-        print(f"Bienvenido, {usuario[1]}!")
-        return usuario[0]  
-    else:
+        if usuario:
+            print(f"Bienvenido, {usuario[1]}!")
+            return usuario[0]  
+
         print("Correo electrónico o contraseña incorrectos.")
         return None
-
-    cursor.close()
+    except Exception as e:
+        print(f"Error al iniciar sesión: {e}")
+        return None
+    finally:
+        if cursor:
+            cursor.close()  

@@ -1,9 +1,8 @@
 import db
 from usuarios import registrar_usuario, iniciar_sesion
-from publicaciones import crear_publicacion, leer_publicaciones, actualizar_publicacion, eliminar_publicacion
+from publicaciones import crear_publicacion, leer_publicaciones, actualizar_publicacion, eliminar_publicacion, buscar_video_por_titulo
 from comentarios import leer_comentarios, crear_comentario, actualizar_comentario, eliminar_comentario
 
-# Para controlar el inicio de sesion
 id_usuario = None
 
 def menu():
@@ -20,6 +19,7 @@ def menu():
 8. Crear comentario
 9. Editar comentario
 10. Eliminar comentario
+11. Buscar video por título
 0. Salir
         """)
         opcion = input("Selecciona una opción: ")
@@ -46,10 +46,9 @@ def menu():
             else:
                 print("Debes iniciar sesión para realizar esta acción.")
         elif opcion == "7":
-                leer_publicaciones() 
-                id_publicacion = input("\nIntroduce el ID de la publicación para ver los comentarios: ")
-                leer_comentarios(id_publicacion)  
-
+            leer_publicaciones()
+            id_publicacion = input("\nIntroduce el ID de la publicación para ver los comentarios: ")
+            leer_comentarios(id_publicacion)
         elif opcion == "8":
             if id_usuario:
                 crear_comentario(id_usuario)
@@ -57,7 +56,7 @@ def menu():
                 print("Debes iniciar sesión para realizar esta acción.")
         elif opcion == "9":
             if id_usuario:
-                actualizar_comentario(id_usuario)
+                actualizar_comentario()
             else:
                 print("Debes iniciar sesión para realizar esta acción.")
         elif opcion == "10":
@@ -65,9 +64,11 @@ def menu():
                 eliminar_comentario(id_usuario)
             else:
                 print("Debes iniciar sesión para realizar esta acción.")
+        elif opcion == "11":
+            buscar_video_por_titulo()
         elif opcion == "0":
             print("Saliendo del programa...")
-            break   
+            break
         else:
             print("Opción no válida. Inténtalo de nuevo.")
 

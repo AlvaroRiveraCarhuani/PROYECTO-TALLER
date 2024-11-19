@@ -1,4 +1,3 @@
-# publicaciones.py
 import db
 
 def verificar_sesion(id_usuario):
@@ -22,24 +21,32 @@ def crear_publicacion(id_usuario):
 
     print("Publicación creada exitosamente.")
     cursor.close()
-
 def leer_publicaciones():
-    cursor = db.connection.cursor()
-    consulta = """
-        SELECT v.id_video, u.nombre_usuario, v.titulo, v.descripcion 
-        FROM videos v 
-        JOIN usuarios u ON v.id_usuario = u.id_usuario
-    """
-    cursor.execute(consulta)
-    publicaciones = cursor.fetchall()
-    if publicaciones:
-        print("\nPublicaciones disponibles:")
-        for publicacion in publicaciones:
-            print(f"ID: {publicacion[0]} | Autor: {publicacion[1]} | Título: {publicacion[2]} | Descripción: {publicacion[3]}")
-    else:
-        print("\nNo hay publicaciones disponibles.")
+    cursor = None  
+    try:
+        cursor = db.connection.cursor()
+        consulta = """
+            SELECT v.id_video, u.nombre_usuario, v.titulo, v.descripcion 
+            FROM videos v 
+            JOIN usuarios u ON v.id_usuario = u.id_usuario
+        """
+        cursor.execute(consulta)
+        publicaciones = cursor.fetchall()  
 
-    cursor.close()
+        if publicaciones:
+            print("\nPublicaciones disponibles:")
+            for publicacion in publicaciones:
+                print(f"ID: {publicacion[0]} | Autor: {publicacion[1]} | Título: {publicacion[2]} | Descripción: {publicacion[3]}")
+        else:
+            print("\nNo hay publicaciones disponibles.")
+
+    except Exception as e:
+        print("Ocurrió un error al leer publicaciones:", e)
+
+    finally:
+        if cursor:  
+            cursor.close()
+
 
 def actualizar_publicacion(id_usuario):
     if not verificar_sesion(id_usuario):
@@ -119,4 +126,27 @@ def eliminar_publicacion(id_usuario):
     db.connection.commit()
 
     print("Publicación eliminada exitosamente.")
+    cursor.close()
+
+def buscar_video_por_titulo():
+    """Permite buscar un video por su título."""
+    titulo_buscar = input("Introduce el título del video que deseas buscar: ")
+
+    cursor = db.connection.cursor()
+    consulta = """
+        SELECT v.id_video, u.nombre_usuario, v.titulo, v.descripcion
+        FROM videos v
+        JOIN usuarios u ON v.id_usuario = u.id_usuario
+        WHERE v.titulo LIKE %s
+    """
+    cursor.execute(consulta, (f"%{titulo_buscar}%",))
+    resultados = cursor.fetchall()
+
+    if resultados:
+        print("\nResultados de búsqueda:")
+        for video in resultados:
+            print(f"ID: {video[0]} | Autor: {video[1]} | Título: {video[2]} | Descripción: {video[3]}")
+    else:
+        print("\nNo se encontraron videos con ese título.")
+
     cursor.close()
