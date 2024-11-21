@@ -1,59 +1,86 @@
 import hashlib
 import db
 
-def registrar_usuario():
-    while True:
-        nombre_usuario = input("Introduce tu nombre de usuario: ").strip()
-        email = input("Introduce tu correo electrónico: ").strip()
-        contrasena = input("Introduce tu contraseña: ").strip()
 
-        if not nombre_usuario or not email or not contrasena: 
-            print("Todos los campos son obligatorios. Por favor, rellena todos los campos.")
-            continue
-        
-        if "@" not in email or "." not in email:
-            print("Por favor, introduce un correo electrónico válido.")
-            continue
+class Usuario:
+    def __init__(self, id_usuario=None, nombre_usuario=None, email=None, contrasena=None):
+        self.id_usuario = id_usuario
+        self.nombre_usuario = nombre_usuario
+        self.email = email
+        self.contrasena = contrasena
 
-        break
+    def registrar_usuario(self):
+        while True:
+            print("Escribe '1' para regresar al menú")
+            nombre_usuario = input("Introduce tu nombre de usuario: ").strip()
+            if nombre_usuario == '1':
+                return  
+            email = input("Introduce tu correo electrónico: ").strip()
+            if email == '1':
+                return  
+            contrasena = input("Introduce tu contraseña: ").strip()
+            if contrasena == '1':
+                return  
+            if not nombre_usuario or not email or not contrasena:
+                print("Todos los campos son obligatorios. Por favor, rellena todos los campos.")
+                continue
+            if "@" not in email or "." not in email:
+                print("Por favor, introduce un correo electrónico válido.")
+                continue
 
-    contrasena_hasheada = hashlib.sha256(contrasena.encode()).hexdigest()
-    cursor = db.connection.cursor()
-    try:
-        consulta = "INSERT INTO usuarios (nombre_usuario, email, contrasena) VALUES (%s, %s, %s)"
-        cursor.execute(consulta, (nombre_usuario, email, contrasena_hasheada))
-        db.connection.commit()
-        print("Usuario registrado exitosamente.")
-    except Exception as e:
-        print("Error al registrar el usuario:", str(e))
-    finally:
-        cursor.close()
+            break
 
-def iniciar_sesion():
-    email = input("Introduce tu correo electrónico: ")
-    contrasena = input("Introduce tu contraseña: ")
-
-    contrasena_hasheada = hashlib.sha256(contrasena.encode()).hexdigest()
-    cursor = None
-    usuario = None
-
-    try:
+        contrasena_hasheada = hashlib.sha256(contrasena.encode()).hexdigest()
         cursor = db.connection.cursor()
-        consulta = "SELECT id_usuario, nombre_usuario FROM usuarios WHERE email = %s AND contrasena = %s"
-        cursor.execute(consulta, (email, contrasena_hasheada))
-        usuario = cursor.fetchone()  
+        try:
+            consulta = "INSERT INTO usuarios (nombre_usuario, email, contrasena) VALUES (%s, %s, %s)"
+            cursor.execute(consulta, (nombre_usuario, email, contrasena_hasheada))
+            db.connection.commit()
+            print("Usuario registrado exitosamente.")
+        except Exception as e:
+            print("Error al registrar el usuario:", str(e))
+        finally:
+            cursor.close()
 
-        cursor.fetchall()  
+    def iniciar_sesion(self):
+        while True:
+            print("Escribe '1' para regresar al menú")
+            email = input("Introduce tu correo electrónico: ").strip()
+            if email == '1':
+                return None  
+            contrasena = input("Introduce tu contraseña : ").strip()
+            if contrasena == '1':
+                return None  
 
-        if usuario:
-            print(f"Bienvenido, {usuario[1]}!")
-            return usuario[0]  
+            contrasena_hasheada = hashlib.sha256(contrasena.encode()).hexdigest()
+            cursor = None
+            usuario = None
 
-        print("Correo electrónico o contraseña incorrectos.")
-        return None
-    except Exception as e:
-        print(f"Error al iniciar sesión: {e}")
-        return None
-    finally:
-        if cursor:
-            cursor.close()  
+            try:
+                cursor = db.connection.cursor()
+                consulta = "SELECT id_usuario, nombre_usuario FROM usuarios WHERE email = %s AND contrasena = %s"
+                cursor.execute(consulta, (email, contrasena_hasheada))
+                usuario = cursor.fetchone()
+
+                cursor.fetchall()
+
+                if usuario:
+                    print(f"Bienvenido, {usuario[1]}!")
+                    self.id_usuario = usuario[0]  # Guardamos el ID del usuario
+                    return self.id_usuario  # Retorna el ID del usuario
+
+                print("Correo electrónico o contraseña incorrectos.")
+                return None
+            except Exception as e:
+                print(f"Error al iniciar sesión: {e}")
+                return None
+            finally:
+                if cursor:
+                    cursor.close()
+
+#Para controlar si el usuario se logeo
+    def verificar_sesion(self):
+        if self.id_usuario is None:
+            print("Error: Debes iniciar sesión para realizar esta acción.")
+            return False
+        return True
