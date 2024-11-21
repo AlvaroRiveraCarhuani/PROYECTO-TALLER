@@ -1,0 +1,35 @@
+def eliminar_perfil():
+    while True:
+        try:
+            id_usuario = int(input("Introduce el ID del perfil que deseas eliminar: "))
+            break
+        except ValueError:
+            print("Por favor, introduce un ID válido.")
+
+    cursor = db.connection.cursor()
+
+    try:
+        # Verificar si el perfil existe
+        consulta_verificar = "SELECT nombre_usuario FROM usuarios WHERE id_usuario = %s"
+        cursor.execute(consulta_verificar, (id_usuario,))
+        perfil = cursor.fetchone()
+
+        if not perfil:
+            print("El perfil con el ID proporcionado no existe.")
+            return
+
+        # Confirmar eliminación
+        confirmacion = input(f"¿Estás seguro de que deseas eliminar el perfil '{perfil[0]}'? (S/N): ").strip().lower()
+        if confirmacion != 's':
+            print("Eliminación cancelada.")
+            return
+
+        # Eliminar el perfil
+        consulta_eliminar = "DELETE FROM usuarios WHERE id_usuario = %s"
+        cursor.execute(consulta_eliminar, (id_usuario,))
+        db.connection.commit()
+        print(f"El perfil '{perfil[0]}' ha sido eliminado exitosamente.")
+    except Exception as e:
+        print("Error al intentar eliminar el perfil:", str(e))
+    finally:
+        cursor.close()
