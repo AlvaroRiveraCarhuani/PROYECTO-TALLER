@@ -7,10 +7,11 @@ class Publicacion:
         self.titulo = titulo
         self.descripcion = descripcion
 
-    def crear_publicacion(self):
-        if not self.verificar_sesion(self.id_usuario):
+    def crear_publicacion(self, id_usuario):  # Agregamos el parámetro id_usuario
+        if not self.verificar_sesion(id_usuario):
             return  
 
+        self.id_usuario = id_usuario  # Asignamos el id_usuario a la instancia
         self.titulo = input("Introduce el título de la publicación: ")
         self.descripcion = input("Introduce una descripción: ")
 
@@ -49,8 +50,8 @@ class Publicacion:
             if cursor:  
                 cursor.close()
 
-    def actualizar_publicacion(self):
-        if not self.verificar_sesion(self.id_usuario):
+    def actualizar_publicacion(self, id_usuario):  # Asegúrate de recibir el parámetro id_usuario
+        if not self.verificar_sesion(id_usuario):
             return  
 
         cursor = db.connection.cursor()
@@ -60,7 +61,7 @@ class Publicacion:
             JOIN usuarios u ON v.id_usuario = u.id_usuario
             WHERE v.id_usuario = %s
         """
-        cursor.execute(consulta, (self.id_usuario,))
+        cursor.execute(consulta, (id_usuario,))
         publicaciones = cursor.fetchall()
         if not publicaciones:
             print("No tienes publicaciones para editar.")
@@ -86,14 +87,14 @@ class Publicacion:
             SET titulo = %s, descripcion = %s 
             WHERE id_video = %s AND id_usuario = %s
         """
-        cursor.execute(consulta_actualizacion, (nuevo_titulo, nueva_descripcion, id_publicacion, self.id_usuario))
+        cursor.execute(consulta_actualizacion, (nuevo_titulo, nueva_descripcion, id_publicacion, id_usuario))
         db.connection.commit()
 
         print("Publicación actualizada exitosamente.")
         cursor.close()
 
-    def eliminar_publicacion(self):
-        if not self.verificar_sesion(self.id_usuario):
+    def eliminar_publicacion(self, id_usuario):  # Asegúrate de recibir el parámetro id_usuario
+        if not self.verificar_sesion(id_usuario):
             return 
 
         cursor = db.connection.cursor()
@@ -103,7 +104,7 @@ class Publicacion:
             JOIN usuarios u ON v.id_usuario = u.id_usuario
             WHERE v.id_usuario = %s
         """
-        cursor.execute(consulta, (self.id_usuario,))
+        cursor.execute(consulta, (id_usuario,))
         publicaciones = cursor.fetchall()
         if not publicaciones:
             print("No tienes publicaciones para eliminar.")
@@ -122,38 +123,31 @@ class Publicacion:
             return  
 
         consulta_eliminacion = "DELETE FROM videos WHERE id_video = %s AND id_usuario = %s"
-        cursor.execute(consulta_eliminacion, (id_publicacion, self.id_usuario))
+        cursor.execute(consulta_eliminacion, (id_publicacion, id_usuario))
         db.connection.commit()
 
         print("Publicación eliminada exitosamente.")
         cursor.close()
 
     def buscar_video_por_titulo(self):
-        
-        titulo_buscar = input("Introduce el título del video que deseas buscar: ")
-
         cursor = db.connection.cursor()
-        consulta = """
-            SELECT v.id_video, u.nombre_usuario, v.titulo, v.descripcion
-            FROM videos v
-            JOIN usuarios u ON v.id_usuario = u.id_usuario
-            WHERE v.titulo LIKE %s
-        """
-        cursor.execute(consulta, (f"%{titulo_buscar}%",))
+        titulo = input("Introduce el título del video que buscas: ")
+        consulta = "SELECT v.id_video, u.nombre_usuario, v.titulo, v.descripcion FROM videos v JOIN usuarios u ON v.id_usuario = u.id_usuario WHERE v.titulo LIKE %s"
+        cursor.execute(consulta, ("%" + titulo + "%",))
         resultados = cursor.fetchall()
 
         if resultados:
             print("\nResultados de búsqueda:")
-            for video in resultados:
-                print(f"ID: {video[0]} | Autor: {video[1]} | Título: {video[2]} | Descripción: {video[3]}")
+            for resultado in resultados:
+                print(f"ID: {resultado[0]} | Autor: {resultado[1]} | Título: {resultado[2]} | Descripción: {resultado[3]}")
         else:
-            print("\nNo se encontraron videos con ese título.")
-
+            print("No se encontraron resultados.")
+        
         cursor.close()
 
     def verificar_sesion(self, id_usuario):
-        """Verifica que el usuario haya iniciado sesión."""
-        if id_usuario is None:
-            print("Error: Debes iniciar sesión para realizar esta acción.")
+        """Verifica si el usuario está autenticado"""
+        if not id_usuario:
+            print("Debes iniciar sesión para continuar.")
             return False
         return True

@@ -2,7 +2,6 @@ from usuarios import Usuario
 from publicaciones import Publicacion
 from comentarios import Comentario
 
-
 class Menu:
     def __init__(self):
         self.id_usuario = None
@@ -17,10 +16,9 @@ class Menu:
             else:
                 self.mostrar_menu_usuario_no_logueado()
 
-#Sirve para mostrar el menu para usuario logeado
     def mostrar_menu_usuario_logueado(self):
         """Menú para usuarios logueados."""
-        print("""
+        print(""" 
             1. Registrarse
             2. Iniciar sesión
             3. Ver publicaciones
@@ -32,6 +30,9 @@ class Menu:
             9. Editar comentario
             10. Eliminar comentario
             11. Buscar video por título
+            12. Visualizar perfiles de otros usuarios
+            13. Actualizar mi perfil
+            14. Eliminar mi perfil
             0. Salir
         """)
         opcion = input("Selecciona una opción: ")
@@ -60,21 +61,31 @@ class Menu:
             self.comentario.eliminar_comentario(self.id_usuario)
         elif opcion == "11":
             self.publicacion.buscar_video_por_titulo()
+        elif opcion == "12":
+            self.usuario.visualizar_perfiles()  # Llama al método de visualizar perfiles
+        elif opcion == "13":
+            self.usuario.actualizar_perfil()
+        elif opcion == "14":
+            self.usuario.eliminar_perfil()
+            if self.usuario.id_usuario is None:  # Verifica si el usuario se eliminó
+                print("Tu perfil ha sido eliminado. Cerrando sesión...")
+                self.id_usuario = None  # Reinicia la sesión
         elif opcion == "0":
             print("Saliendo del programa...")
             exit()
         else:
             print("Opción no válida. Inténtalo de nuevo.")
-#mostrar menu de usuario no logeado
+
     def mostrar_menu_usuario_no_logueado(self):
         """Menú para usuarios no logueados."""
-        print("""
+        print(""" 
             1. Registrarse
             2. Iniciar sesión
             3. Ver publicaciones
             4. Ver comentarios
             5. Crear comentario
             6. Buscar video por título
+            7. Visualizar perfiles de otros usuarios
             0. Salir
         """)
         opcion = input("Selecciona una opción: ")
@@ -86,6 +97,7 @@ class Menu:
         elif opcion == "3":
             self.publicacion.leer_publicaciones()
         elif opcion == "4":
+            self.publicacion.leer_publicaciones()
             id_publicacion = input("\nIntroduce el ID de la publicación para ver los comentarios: ")
             self.comentario.leer_comentarios(id_publicacion)
         elif opcion == "5":
@@ -93,8 +105,10 @@ class Menu:
             self.mostrar_menu_autenticacion()
         elif opcion == "6":
             self.publicacion.buscar_video_por_titulo()
+        elif opcion == "7":
+            self.usuario.visualizar_perfiles()  # Llama al método de visualizar perfiles
         elif opcion == "0":
-            print("Saliendo de tiktok..")
+            print("Saliendo de tiktok...")
             exit()
         else:
             print("Opción no válida. Inténtalo de nuevo.")
@@ -102,7 +116,7 @@ class Menu:
     def mostrar_menu_autenticacion(self):
         """Menú para redirigir a registro o inicio de sesión."""
         while True:
-            print("""
+            print(""" 
                 1. Registrarse
                 2. Iniciar sesión
                 0. Volver al menú principal
@@ -119,8 +133,7 @@ class Menu:
                 break
             else:
                 print("Opción no válida. Inténtalo de nuevo.")
-
-
+                                
 if __name__ == "__main__":
     menu = Menu()
     menu.mostrar_menu()

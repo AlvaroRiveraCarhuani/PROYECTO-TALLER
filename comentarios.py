@@ -8,57 +8,50 @@ class Comentario:
         self.id_video = id_video
         self.contenido = contenido
 
-    def crear_comentario(self):
-        if not self.verificar_sesion(self.id_usuario):
-            return  
+    def crear_comentario(self, id_usuario):
+        if not self.verificar_sesion(id_usuario):
+            return
 
-        # Lee las publicaciones para permitir al usuario elegir una
-        publicacion = Publicacion(self.id_usuario)
+        publicacion = Publicacion(id_usuario)
         publicacion.leer_publicaciones()
 
         self.id_video = input("Introduce el ID del video en el que deseas comentar: ")
         self.contenido = input("Escribe tu comentario: ")
 
         cursor = db.connection.cursor()
-
         consulta = "INSERT INTO comentarios (id_usuario, id_video, contenido) VALUES (%s, %s, %s)"
-        cursor.execute(consulta, (self.id_usuario, self.id_video, self.contenido))
+        cursor.execute(consulta, (id_usuario, self.id_video, self.contenido))
         db.connection.commit()
 
         print("Comentario creado exitosamente.")
         cursor.close()
 
-    def leer_comentarios(self):
-        # Lee las publicaciones para permitir al usuario elegir una
-        publicacion = Publicacion(self.id_usuario)
-        publicacion.leer_publicaciones()
-
-        self.id_video = input("\nIntroduce el ID de la publicación para ver los comentarios: ")
-
+    def leer_comentarios(self, id_video):
         cursor = db.connection.cursor()
-        consulta = """SELECT c.id_comentario, u.nombre_usuario, c.contenido FROM comentarios c 
+        consulta = """SELECT c.id_comentario, u.nombre_usuario, c.contenido 
+                      FROM comentarios c 
                       JOIN usuarios u ON c.id_usuario = u.id_usuario  
                       WHERE c.id_video = %s"""
-        cursor.execute(consulta, (self.id_video,))
+        cursor.execute(consulta, (id_video,))
         comentarios = cursor.fetchall()
 
         if not comentarios:
             print("No hay comentarios para esta publicación.")
         else:
-            print(f"Comentarios del video {self.id_video}:")
+            print(f"Comentarios del video {id_video}:")
             for comentario in comentarios:
-                # Muestra ID, nombre de usuario y comentario
                 print(f"{comentario[0]}. {comentario[1]}: {comentario[2]}")
 
         cursor.close()
 
-    def actualizar_comentario(self):
+    def actualizar_comentario(self, id_usuario):
+        if not self.verificar_sesion(id_usuario):
+            return
+
         cursor = db.connection.cursor()
-        consulta = """
-            SELECT c.id_comentario, u.nombre_usuario, c.contenido 
-            FROM comentarios c 
-            JOIN usuarios u ON c.id_usuario = u.id_usuario
-        """
+        consulta = """SELECT c.id_comentario, u.nombre_usuario, c.contenido 
+                      FROM comentarios c 
+                      JOIN usuarios u ON c.id_usuario = u.id_usuario"""
         cursor.execute(consulta)
         comentarios = cursor.fetchall()
 
@@ -80,33 +73,27 @@ class Comentario:
 
         nuevo_contenido = input("Introduce el nuevo contenido del comentario: ")
 
-        consulta_actualizacion = """
-            UPDATE comentarios 
-            SET contenido = %s 
-            WHERE id_comentario = %s
-        """
+        consulta_actualizacion = """UPDATE comentarios SET contenido = %s WHERE id_comentario = %s"""
         cursor.execute(consulta_actualizacion, (nuevo_contenido, id_comentario))
         db.connection.commit()
 
         print("Comentario actualizado exitosamente.")
         cursor.close()
 
-    def eliminar_comentario(self):
-        if not self.verificar_sesion(self.id_usuario):
-            return  
+    def eliminar_comentario(self, id_usuario):
+        if not self.verificar_sesion(id_usuario):
+            return
 
-        publicacion = Publicacion(self.id_usuario)
+        publicacion = Publicacion(id_usuario)
         publicacion.leer_publicaciones()
 
         self.id_video = input("\nIntroduce el ID de la publicación para ver los comentarios: ")
 
         cursor = db.connection.cursor()
-        consulta = """
-            SELECT c.id_comentario, u.nombre_usuario, c.contenido
-            FROM comentarios c
-            JOIN usuarios u ON c.id_usuario = u.id_usuario
-            WHERE c.id_video = %s
-        """
+        consulta = """SELECT c.id_comentario, u.nombre_usuario, c.contenido
+                      FROM comentarios c
+                      JOIN usuarios u ON c.id_usuario = u.id_usuario
+                      WHERE c.id_video = %s"""
         cursor.execute(consulta, (self.id_video,))
         comentarios = cursor.fetchall()
 
