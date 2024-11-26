@@ -1,6 +1,6 @@
 import db
 from publicaciones import Publicacion
-
+#comentario nuevo
 class Comentario:
     def __init__(self, id_comentario=None, id_usuario=None, id_video=None, contenido=None):
         self.id_comentario = id_comentario
