@@ -26,32 +26,32 @@ class Publicacion:
         print("Publicación creada exitosamente.")
         cursor.close() #Cerramos el cursor para para que no vea error al ejecutar otro cursor 
 
-    def leer_publicaciones(self):
-        cursor = None  #Inicializamos la variable cursor en None
+    def leer_publicaciones(self):  # Método para leer todas las publicaciones
+        cursor = None  # Inicializa el cursor como None
+        # se utiliza para manejar excepciones o errorese
         try:
-            cursor = db.connection.cursor() #inicializamos el cursor
+            cursor = db.connection.cursor()  # Crea un cursor para ejecutar consultas SQL
             consulta = """
                 SELECT v.id_video, u.nombre_usuario, v.titulo, v.descripcion 
                 FROM videos v 
                 JOIN usuarios u ON v.id_usuario = u.id_usuario
-            """
-            cursor.execute(consulta) #ejecutamos la consulta 
-            publicaciones = cursor.fetchall()  #fetchall para mostrar todas las publicaciones disponibles
+            """  # Consulta SQL para obtener las publicaciones junto con el nombre del usuario
+            cursor.execute(consulta)  # Ejecuta la consulta
+            publicaciones = cursor.fetchall()  # Obtiene todas las filas de resultados
 
-            if publicaciones:
+            if publicaciones:  # Si hay publicaciones, las muestra
                 print("\nPublicaciones disponibles:")
-                for publicacion in publicaciones: #Bucle for para imprimir los campos de la tabla publicaciones
-                    print(f"ID: {publicacion[0]} | Autor: {publicacion[1]} | Título: {publicacion[2]} | Descripción: {publicacion[3]}")
+                for publicacion in publicaciones: # Recorre todos los publicaciones y los muestra
+                    print(f"ID: {publicacion[0]} | Autor: {publicacion[1]} | Título: {publicacion[2]} | Descripción: {publicacion[3]}")  # Muestra los detalles de cada publicación
             else:
-                print("\nNo hay publicaciones disponibles.")
-
-        except Exception as e:
+                print("\nNo hay publicaciones disponibles.")  # Si no hay publicaciones, informa al usuario
+# para manejar errores o excepciones
+        except Exception as e:  # Si ocurre un error durante la ejecución, muestra el error
             print("Ocurrió un error al leer publicaciones:", e)
-
+# se ejecutará siempre, sin importar si ocurrió un error o no en el bloque try
         finally:
-            if cursor:  
-                cursor.close() #Cerrar el cursor
-
+            if cursor:  # Si el cursor fue creado, lo cierra para liberar recursos
+                cursor.close()
     def actualizar_publicacion(self, id_usuario):  
         if not self.verificar_sesion(id_usuario): #Verficamos que el usuario este con un id
             return  
