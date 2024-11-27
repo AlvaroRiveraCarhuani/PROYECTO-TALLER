@@ -1,21 +1,22 @@
-from usuarios import Usuario
-from publicaciones import Publicacion
-from comentarios import Comentario
+from usuarios import Usuario #importamos de el archivo usuarios.py la clase Usuario
+from publicaciones import Publicacion  #importamos de el archivo publicaciones.py la clase Publicacion
+from comentarios import Comentario #importamos de el archivo publicaciones.py la clase Publicacion
 
 class Menu:
+    #Constructor para instaciar la clase Usuario, Publicacion, Comentario
     def __init__(self):
         self.id_usuario = None
         self.usuario = Usuario()
         self.publicacion = Publicacion()
         self.comentario = Comentario()
-
+#Funcion con bucle para verficar si el usuario esta logeado o no logeado
     def mostrar_menu(self):
         while True:
             if self.id_usuario:
                 self.mostrar_menu_usuario_logueado()
             else:
                 self.mostrar_menu_usuario_no_logueado()
-
+#Fucnion para mostrar si el usuario esta logeado , menu para usuarios logueados 
     def mostrar_menu_usuario_logueado(self):
         """Menú para usuarios logueados."""
         print(""" 
@@ -36,9 +37,9 @@ class Menu:
             0. Salir
         """)
         opcion = input("Selecciona una opción: ")
-
+        #Pedir al usuario por teclado para que se ejecute diferentes funciones de acuerdo a la opcion
         if opcion == "1":
-            self.usuario.registrar_usuario()
+            self.usuario.registrar_usuario() #Si elige la opcion 2 no ejecuta ninguna funciona ya que se logeo
         elif opcion == "2":
             print("Ya has iniciado sesión.")
         elif opcion == "3":
@@ -69,12 +70,14 @@ class Menu:
             self.usuario.eliminar_perfil()
             if self.usuario.id_usuario is None:  # Verifica si el usuario se eliminó
                 print("Tu perfil ha sido eliminado. Cerrando sesión...")
-                self.id_usuario = None  # Reinicia la sesión
+                self.id_usuario = None  # Reinicia la sesión para mandarlo al menu usuario no logeado
         elif opcion == "0":
             print("Saliendo del programa...")
             exit()
         else:
             print("Opción no válida. Inténtalo de nuevo.")
+
+#menu par usuarios no logueados 
 
     def mostrar_menu_usuario_no_logueado(self):
         """Menú para usuarios no logueados."""
@@ -112,7 +115,7 @@ class Menu:
             exit()
         else:
             print("Opción no válida. Inténtalo de nuevo.")
-
+    #Funcion usada en el menu de usuario no logeado, cuando quiera crear un comentario sin iniciar sesion mandarlo esta funcion
     def mostrar_menu_autenticacion(self):
         """Menú para redirigir a registro o inicio de sesión."""
         while True:

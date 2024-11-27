@@ -1,3 +1,4 @@
+-- SQLBook: Code
 CREATE DATABASE IF NOT EXISTS tiktok_db;
 USE tiktok_db;
 
